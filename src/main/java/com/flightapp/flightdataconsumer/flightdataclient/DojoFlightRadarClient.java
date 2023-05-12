@@ -1,9 +1,11 @@
 package com.flightapp.flightdataconsumer.flightdataclient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flightapp.flightdataconsumer.flightdataclient.dto.FlightData;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,8 +25,21 @@ class DojoFlightRadarClient implements FlightDataClient {
     }
 
     @Override
-    public FlightData fetchFlightData() {
-        return null;
+    public FlightsListByAirlineResponseDto fetchFlightData() {
+        try {
+            //TODO request parameter
+            String uri = String.format("https://flight-radar1.p.rapidapi.com/flights/list-by-airline?airline=LO");
+
+            // create headers
+            HttpHeaders headers = createHeaders();
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            ResponseEntity<String> result = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
+            return objectMapper.readValue(result.getBody(), FlightsListByAirlineResponseDto.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     private HttpHeaders createHeaders() {
